@@ -1,3 +1,24 @@
+//! # LPU WiFi Manager
+//!
+//! `llogin` is a command-line tool for managing LPU WiFi connections.
+//!
+//! This tool provides several commands:
+//!
+//! - `--help` or `-h`: Show the help message.
+//! - `--version` or `-v`: Show the version of the program.
+//! - `--account` or `-a`: Perform LPU login with the provided account ID.
+//! - `--list` or `-l`: List all stored account IDs.
+//!
+//! If no command is provided, the tool will prompt the user for an account ID and perform LPU login.
+//!
+//! The tool checks if the user is connected to LPU WiFi before performing any operations.
+//! If the user is not connected to LPU WiFi, the tool will exit with an error message.
+//!
+//! The tool stores LPU credentials in environment variables and writes them to a file.
+//! The file is updated every time the user stores new credentials.
+//!
+//! The tool uses the `nmcli` command to check the WiFi connection and the `curl` command to send login requests.
+
 use dirs_next::home_dir;
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader, Write};
@@ -5,6 +26,9 @@ use std::path::Path;
 use std::process;
 use std::{env, process::Command};
 
+/// Shows the help message.
+///
+/// This function prints the usage information and the list of available options.
 fn show_help() {
     println!(
         "Usage: {} [OPTION] [ACCOUNT_ID]",
@@ -19,10 +43,17 @@ fn show_help() {
     println!(" --account or -a    Followed by the account ID you want to login as.");
 }
 
+/// Shows the version of the program.
+///
+/// This function prints the version of the LPU WiFi Manager.
 fn show_version() {
-    println!("LPU WiFi Manager 1.2");
+    println!("LPU WiFi Manager 0.1.0");
 }
 
+/// Prompts the user for an account ID.
+///
+/// This function prints a prompt to the standard output, reads a line from the standard input,
+/// trims leading and trailing whitespace, and returns the result.
 fn prompt_for_account_id() -> String {
     print!("Enter the account ID or Name: ");
     io::stdout().flush().unwrap();
@@ -31,6 +62,10 @@ fn prompt_for_account_id() -> String {
     account_id.trim().to_string()
 }
 
+/// Lists all stored account IDs.
+///
+/// This function prints all stored account IDs by iterating over the environment variables
+/// and printing the ones that start with "LPU_USERNAME_".
 fn list_account_ids() {
     println!("Stored account IDs:");
     let mut found = false;
@@ -48,6 +83,10 @@ fn list_account_ids() {
     }
 }
 
+/// Checks if the user is connected to LPU WiFi.
+///
+/// This function runs the `nmcli` command to get the list of active WiFi connections
+/// and checks if any of them start with "yes:LPU".
 fn check_lpu_wifi() -> bool {
     if let Ok(output) = std::process::Command::new("nmcli")
         .args(&["-t", "-f", "active,ssid", "dev", "wifi"])
@@ -62,6 +101,10 @@ fn check_lpu_wifi() -> bool {
     false
 }
 
+/// Stores LPU credentials.
+///
+/// This function prompts the user for an account ID, a username, and a password,
+/// stores them in environment variables, writes them to a file, and updates the shell configuration file.
 fn store_lpu_credentials() {
     print!("Enter a unique identifier for this account: ");
     io::stdout().flush().unwrap();
@@ -112,7 +155,7 @@ fn store_lpu_credentials() {
             if val.contains("bash") {
                 home_dir.join(".bashrc")
             } else if val.contains("zsh") {
-                home_dir.join(".config/zsh/.zshrc")
+                home_dir.join(".zshrc")
             } else if val.contains("fish") {
                 home_dir.join(".config/fish/config.fish")
             } else {
@@ -150,6 +193,10 @@ fn store_lpu_credentials() {
     }
 }
 
+/// Performs LPU login.
+///
+/// This function takes an account ID as an argument, retrieves the corresponding username and password
+/// from the environment variables, and sends a login request using the `curl` command.
 fn perform_lpu_login(account_id: &str) {
     let username_var = format!("LPU_USERNAME_{}", account_id);
     let password_var = format!("LPU_PASSWORD_{}", account_id);
@@ -186,6 +233,10 @@ fn perform_lpu_login(account_id: &str) {
     }
 }
 
+/// The main function of the program.
+///
+/// This function checks if the user is connected to LPU WiFi, parses the command line arguments,
+/// and calls the appropriate function based on the arguments.
 fn main() {
     if !check_lpu_wifi() {
         println!("Not connected to LPU WiFi. Exiting.");
@@ -223,4 +274,3 @@ fn main() {
         }
     }
 }
-
