@@ -47,7 +47,7 @@ fn show_help() {
 ///
 /// This function prints the version of the LPU WiFi Manager.
 fn show_version() {
-    println!("LPU WiFi Manager 0.1.0");
+    println!("LPU WiFi Manager 0.1.1");
 }
 
 /// Prompts the user for an account ID.

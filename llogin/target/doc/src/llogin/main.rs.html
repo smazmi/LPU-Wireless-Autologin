@@ -325,7 +325,7 @@
 ///
 /// This function prints the version of the LPU WiFi Manager.
 </span><span class="kw">fn </span>show_version() {
-    <span class="macro">println!</span>(<span class="string">"LPU WiFi Manager 0.1.0"</span>);
+    <span class="macro">println!</span>(<span class="string">"LPU WiFi Manager 0.1.1"</span>);
 }
 
 <span class="doccomment">/// Prompts the user for an account ID.
@@ -433,7 +433,7 @@
             <span class="kw">if </span>val.contains(<span class="string">"bash"</span>) {
                 home_dir.join(<span class="string">".bashrc"</span>)
             } <span class="kw">else if </span>val.contains(<span class="string">"zsh"</span>) {
-                home_dir.join(<span class="string">".config/zsh/.zshrc"</span>)
+                home_dir.join(<span class="string">".zshrc"</span>)
             } <span class="kw">else if </span>val.contains(<span class="string">"fish"</span>) {
                 home_dir.join(<span class="string">".config/fish/config.fish"</span>)
             } <span class="kw">else </span>{
